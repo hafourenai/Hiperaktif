@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Daftar Game{% endblock %}
+
+{% block content %}
+<div class="games-page">
+    <a href="{{ url_for('index') }}" class="back-btn">⬅️ Kembali</a>
+    
+    <h1 class="page-title">🎮 Pilih Game Favoritmu! 🎮</h1>
+    
+    <div class="games-grid">
+        {% if games %}
+            {% for game in games %}
+            <div class="game-card">
+                <div class="game-icon">🎯</div>
+                <h3 class="game-title">{{ game.name }}</h3>
+                <div class="game-actions">
+                    <a href="{{ game.url }}" target="_blank" class="btn btn-play">Mainkan Sekarang!</a>
+                    <a href="{{ game.url }}" class="btn btn-play-iframe" data-game="{{ game.name }}" data-url="{{ game.url }}">Main di Sini</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-games">
+                <p>😢 Belum ada game yang tersedia.</p>
+                <p>Letakkan folder game di <code>static/games/</code></p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal untuk bermain game dalam iframe -->
+<div id="gameModal" class="game-modal">
+    <div class="modal-content">
+        <button id="closeModal" class="close-modal">✕ Tutup</button>
+        <h2 id="modalGameTitle"></h2>
+        <div class="iframe-container">
+            <iframe id="gameIframe" src="" frameborder="0"></iframe>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Handling modal untuk bermain game
+    const modal = document.getElementById('gameModal');
+    const iframe = document.getElementById('gameIframe');
+    const modalTitle = document.getElementById('modalGameTitle');
+    const closeBtn = document.getElementById('closeModal');
+    const playIframeButtons = document.querySelectorAll('.btn-play-iframe');
+
+    playIframeButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const gameTitle = btn.dataset.game;
+            const gameUrl = btn.dataset.url;
+            
+            modalTitle.textContent = gameTitle;
+            iframe.src = gameUrl;
+            modal.style.display = 'flex';
+        });
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+        iframe.src = '';
+    });
+
+    // Tutup modal jika klik di luar konten
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            iframe.src = '';
+        }
+    });
+
+    // Animasi kartu game
+    const gameCards = document.querySelectorAll('.game-card');
+    gameCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-10px) scale(1.03)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+</script>
+{% endblock %}

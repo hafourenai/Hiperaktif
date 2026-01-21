@@ -1,0 +1,80 @@
+
+{% extends "base.html" %}
+
+{% block title %}Belajar Membaca{% endblock %}
+
+{% block content %}
+<div class="reading-page">
+    <a href="{{ url_for('index') }}" class="back-btn">⬅️ Kembali</a>
+    
+    <h1 class="page-title">📚 Ayo Belajar Membaca! 📚</h1>
+    
+    <div class="reading-container">
+        <!-- Section 1: Kenali Huruf -->
+        <div class="reading-section">
+            <h2 class="section-title">🔤 Kenali Huruf</h2>
+            <p class="section-desc">Klik huruf untuk mendengar bunyinya!</p>
+            
+            <div class="alphabet-grid" id="alphabetGrid">
+                <!-- Huruf akan di-generate oleh JavaScript -->
+            </div>
+            
+            <!-- Container untuk pagination -->
+            <div class="letter-pagination" id="letterPagination" style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 20px;
+                margin-top: 25px;
+                padding: 15px;
+            ">
+                <!-- Tombol pagination akan di-generate oleh JavaScript -->
+            </div>
+        </div>
+
+        <!-- Section 2: Susun Kata -->
+        <div class="reading-section">
+            <h2 class="section-title">🧩 Susun Kata</h2>
+            <p class="section-desc">Susun huruf-huruf ini menjadi kata yang benar!</p>
+            
+            <div class="word-game">
+                <div class="target-image">
+                    <img id="targetImage" src="{{ url_for('static', filename='images/cat.png') }}" alt="Gambar Target">
+                </div>
+                
+                <div class="word-hint">
+                    <p>Susun kata: <span id="wordHint">KUCING</span></p>
+                </div>
+                
+                <div class="letter-tiles" id="letterTiles">
+                    <!-- Huruf acak akan muncul di sini -->
+                </div>
+                
+                <div class="answer-area" id="answerArea">
+                    <!-- Area untuk meletakkan huruf -->
+                </div>
+                
+                <div class="game-buttons">
+                    <button id="checkWordBtn" class="btn btn-check">Cek Kata ✓</button>
+                    <button id="resetWordBtn" class="btn btn-reset">Ulang 🔄</button>
+                </div>
+                
+                <div id="wordFeedback" class="feedback"></div>
+            </div>
+        </div>
+
+        <!-- Score Board -->
+        <div class="score-board">
+            <p>Skor: <span id="readingScore">0</span> 🌟</p>
+        </div>
+    </div>
+</div>
+
+<!-- Audio untuk huruf (akan di-load dynamically) -->
+<div id="audioContainer"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/reading.js') }}"></script>
+{% endblock %}
+[file content end]

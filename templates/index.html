@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Selamat Datang - Belajar Seru!{% endblock %}
+
+{% block content %}
+<!-- Tribal Ornaments -->
+
+<div class="main-menu">
+    <h1 class="main-title">🌟 Selamat Datang! 🌟</h1>
+    <p class="subtitle">Pilih aktivitas yang kamu suka!</p>
+    
+    <div class="menu-cards">
+        <!-- Card 1: Matematika -->
+        <div class="menu-card math-card">
+            <div class="card-icon">🔢</div>
+            <h2>Ayo Belajar Matematika</h2>
+            <p>Belajar hitung-hitungan dengan cara yang menyenangkan!</p>
+            <a href="{{ url_for('math') }}" class="btn btn-primary">Mulai Belajar!</a>
+        </div>
+
+        <!-- Card 2: Membaca -->
+        <div class="menu-card reading-card">
+            <div class="card-icon">📚</div>
+            <h2>Ayo Belajar Membaca</h2>
+            <p>Kenali huruf dan kata dengan cara yang seru!</p>
+            <a href="{{ url_for('reading') }}" class="btn btn-success">Mulai Belajar!</a>
+        </div>
+
+        <!-- Card 3: Game -->
+        <div class="menu-card games-card">
+            <div class="card-icon">🎮</div>
+            <h2>Mau Main Game?</h2>
+            <p>Pilih game favoritmu dan bermain sepuasnya!</p>
+            <a href="{{ url_for('games') }}" class="btn btn-warning">Main Sekarang!</a>
+        </div>
+    </div>
+
+    <div class="footer-decoration">
+        <span class="star">⭐</span>
+        <span class="star">✨</span>
+        <span class="star">🌈</span>
+        <span class="star">✨</span>
+        <span class="star">⭐</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animasi tambahan untuk kartu
+    const cards = document.querySelectorAll('.menu-card');
+    
+    // Random floating animation untuk setiap kartu
+    cards.forEach((card, index) => {
+        setInterval(() => {
+            const randomY = Math.random() * 10 - 5;
+            const randomRotate = Math.random() * 4 - 2;
+            card.style.transform = `translateY(${randomY}px) rotate(${randomRotate}deg)`;
+        }, 2000 + (index * 500));
+    });
+    
+    // Particle effect saat hover
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', createParticles);
+    });
+    
+    function createParticles(e) {
+        const colors = ['#ffff00', '#00ffff', '#ff69b4', '#00ff00', '#ff9933'];
+        for (let i = 0; i < 15; i++) {
+            const particle = document.createElement('div');
+            particle.style.position = 'fixed';
+            particle.style.left = e.clientX + 'px';
+            particle.style.top = e.clientY + 'px';
+            particle.style.width = '8px';
+            particle.style.height = '8px';
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '9999';
+            
+            document.body.appendChild(particle);
+            
+            const angle = (Math.PI * 2 * i) / 15;
+            const velocity = 100 + Math.random() * 100;
+            
+            particle.animate([
+                { 
+                    transform: 'translate(0, 0) scale(1)', 
+                    opacity: 1 
+                },
+                { 
+                    transform: `translate(${Math.cos(angle) * velocity}px, ${Math.sin(angle) * velocity}px) scale(0)`, 
+                    opacity: 0 
+                }
+            ], {
+                duration: 1000 + Math.random() * 500,
+                easing: 'cubic-bezier(0, .9, .57, 1)'
+            }).onfinish = () => particle.remove();
+        }
+    }
+    
+    // Animasi cursor trail (bintang mengikuti kursor)
+    document.addEventListener('mousemove', (e) => {
+        if (Math.random() > 0.9) { // 10% chance per mouse move
+            const star = document.createElement('div');
+            star.textContent = ['⭐', '✨', '💫', '🌟'][Math.floor(Math.random() * 4)];
+            star.style.position = 'fixed';
+            star.style.left = e.clientX + 'px';
+            star.style.top = e.clientY + 'px';
+            star.style.fontSize = '20px';
+            star.style.pointerEvents = 'none';
+            star.style.zIndex = '9999';
+            
+            document.body.appendChild(star);
+            
+            star.animate([
+                { transform: 'translateY(0) scale(1)', opacity: 1 },
+                { transform: 'translateY(-50px) scale(0)', opacity: 0 }
+            ], {
+                duration: 1000,
+                easing: 'ease-out'
+            }).onfinish = () => star.remove();
+        }
+    });
+    
+    document.body.classList.add('index-page');
+    
+    // Shake effect random pada ornamen
+    setInterval(() => {
+        const ornaments = document.querySelectorAll('.tribal-ornament');
+        const randomOrnament = ornaments[Math.floor(Math.random() * ornaments.length)];
+        randomOrnament.style.animation = 'shake 0.5s';
+        setTimeout(() => {
+            randomOrnament.style.animation = 'float 6s ease-in-out infinite';
+        }, 500);
+    }, 5000);
+
+    // Keyframes untuk shake
+    const styleSheet = document.styleSheets[0];
+    styleSheet.insertRule(`
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px) rotate(-5deg); }
+            75% { transform: translateX(10px) rotate(5deg); }
+        }
+    `, styleSheet.cssRules.length);
+</script>
+{% endblock %}

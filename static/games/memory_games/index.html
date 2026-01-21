@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Card Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .score-board {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .score-board p {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 15px;
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        .card.flipped {
+            background: white;
+        }
+
+        .card.matched {
+            background: #51cf66;
+            cursor: default;
+        }
+
+        .card .front {
+            display: none;
+        }
+
+        .card.flipped .front {
+            display: block;
+        }
+
+        .card.flipped .back {
+            display: none;
+        }
+
+        .card .back {
+            font-size: 40px;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                grid-template-columns: repeat(4, 70px);
+                gap: 10px;
+                padding: 20px;
+            }
+
+            .card {
+                width: 70px;
+                height: 70px;
+                font-size: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🧠 Memory Card Game 🧠</h1>
+    
+    <div class="score-board">
+        <p>Langkah: <span id="moves">0</span> | Cocok: <span id="matched">0</span>/8</p>
+    </div>
+
+    <div class="game-container" id="gameContainer">
+        <!-- Cards akan di-generate oleh JavaScript -->
+    </div>
+
+    <button class="reset-btn" onclick="resetGame()">🔄 Main Lagi</button>
+
+    <script>
+        // Data emoji untuk kartu
+        const emojis = ['🐱', '🐶', '🐼', '🦁', '🐯', '🐸', '🐵', '🦊'];
+        let cards = [...emojis, ...emojis]; // Duplikat untuk pasangan
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let canFlip = true;
+
+        // Shuffle array
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Buat kartu
+        function createCards() {
+            const container = document.getElementById('gameContainer');
+            container.innerHTML = '';
+            shuffle(cards);
+
+            cards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.emoji = emoji;
+                card.dataset.index = index;
+                card.innerHTML = `
+                    <div class="back">❓</div>
+                    <div class="front">${emoji}</div>
+                `;
+                card.addEventListener('click', flipCard);
+                container.appendChild(card);
+            });
+        }
+
+        // Flip kartu
+        function flipCard() {
+            if (!canFlip) return;
+            if (this.classList.contains('flipped') || this.classList.contains('matched')) return;
+
+            this.classList.add('flipped');
+            flippedCards.push(this);
+
+            if (flippedCards.length === 2) {
+                canFlip = false;
+                moves++;
+                document.getElementById('moves').textContent = moves;
+                checkMatch();
+            }
+        }
+
+        // Cek kecocokan
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            const emoji1 = card1.dataset.emoji;
+            const emoji2 = card2.dataset.emoji;
+
+            if (emoji1 === emoji2) {
+                // Cocok!
+                setTimeout(() => {
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    flippedCards = [];
+                    matchedPairs++;
+                    document.getElementById('matched').textContent = matchedPairs;
+                    canFlip = true;
+
+                    // Cek kemenangan
+                    if (matchedPairs === 8) {
+                        setTimeout(() => {
+                            alert(`🎉 Selamat! Kamu menang dengan ${moves} langkah!`);
+                        }, 500);
+                    }
+                }, 500);
+            } else {
+                // Tidak cocok
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                    flippedCards = [];
+                    canFlip = true;
+                }, 1000);
+            }
+        }
+
+        // Reset game
+        function resetGame() {
+            flippedCards = [];
+            matchedPairs = 0;
+            moves = 0;
+            canFlip = true;
+            document.getElementById('moves').textContent = 0;
+            document.getElementById('matched').textContent = 0;
+            createCards();
+        }
+
+        // Initialize
+        createCards();
+    </script>
+</body>
+</html>

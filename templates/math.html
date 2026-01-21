@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Belajar Matematika{% endblock %}
+
+{% block content %}
+<div class="math-page">
+    <a href="{{ url_for('index') }}" class="back-btn">⬅️ Kembali</a>
+    
+    <div class="header">
+        <h1 class="page-title">🔢 Ayo Belajar Matematika! 🔢</h1>
+    </div>
+    
+    <div class="math-container">
+        <!-- ========================================
+             SECTION 1: KENALI ANGKA 0-9
+        ======================================== -->
+        <div class="card number-recognition-section">
+            <h2 class="section-title">🎯 Kenali Angka</h2>
+            <p class="section-desc">Klik angka untuk mendengar bunyinya!</p>
+            
+            <div class="number-grid" id="numberGrid">
+                <!-- Angka 0-9 akan di-generate oleh JavaScript -->
+            </div>
+            
+            <div class="number-score">
+                <p>Skor Pengenalan: <span id="recognitionScore">0</span> 🌟</p>
+            </div>
+        </div>
+        
+        <!-- ========================================
+             SECTION 2: OPERATION SELECTOR
+        ======================================== -->
+        <div class="card operation-section">
+            <h2 class="section-title">🎮 Pilih Jenis Soal</h2>
+            <p class="section-desc">Pilih operasi matematika yang ingin dipelajari!</p>
+            
+            <div class="operation-selector" id="operationSelector">
+                <!-- Tombol operasi akan di-generate oleh JavaScript -->
+            </div>
+        </div>
+        
+        <!-- ========================================
+             SECTION 3: LATIHAN SOAL
+        ======================================== -->
+        <div class="card exercise-section">
+            <h2 class="section-title">✏️ Latihan Soal</h2>
+            <p class="section-desc">Selesaikan pertanyaan dengan cepatmu!</p>
+            
+            <div class="score-board">
+                <div class="score-item">
+                    <span class="label">Benar:</span>
+                    <span id="correctScore" class="score correct">0</span>
+                </div>
+                <div class="score-item">
+                    <span class="label">Salah:</span>
+                    <span id="wrongScore" class="score wrong">0</span>
+                </div>
+            </div>
+
+            <div class="question-box" id="questionBox">
+                <div class="question-text">
+                    <span id="num1" class="number">5</span>
+                    <span id="operation" class="operator">+</span>
+                    <span id="num2" class="number">3</span>
+                    <span class="operator">=</span>
+                    <span class="question-mark">?</span>
+                </div>
+            </div>
+
+            <div class="answer-section">
+                <input type="number" id="answerInput" class="answer-input" placeholder="Tulis jawabanmu..." autofocus>
+                <button id="checkBtn" class="btn btn-check">Cek Jawaban ✓</button>
+            </div>
+
+            <div id="feedback" class="feedback"></div>
+
+            <button id="nextBtn" class="btn btn-next" style="display: none;">Soal Berikutnya →</button>
+        </div>
+    </div>
+
+    <!-- Floating Elements -->
+    <div class="decoration-elements">
+        <span class="float-emoji" style="left: 10%; top: 15%; animation-delay: 0s;">⭐</span>
+        <span class="float-emoji" style="left: 85%; top: 20%; animation-delay: 1s;">✨</span>
+        <span class="float-emoji" style="left: 50%; top: 10%; animation-delay: 2s;">🌟</span>
+    </div>
+</div>
+
+<!-- Audio untuk feedback -->
+<audio id="correctSound" src="{{ url_for('static', filename='sounds/correct.mp3') }}"></audio>
+<audio id="wrongSound" src="{{ url_for('static', filename='sounds/wrong.mp3') }}"></audio>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/math.js') }}"></script>
+{% endblock %}

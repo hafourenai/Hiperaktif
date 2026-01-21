@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Belajar Seru!{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body class="{% if request.endpoint == 'math' %}math-page{% elif request.endpoint == 'reading' %}reading-page{% elif request.endpoint == 'games' %}games-page{% elif request.endpoint == 'index' %}index-page{% endif %}">
+    <div class="music-control">
+      <button id="musicToggle" class="music-btn">🔊</button>
+    </div>
+
+    <div class="container">{% block content %}{% endblock %}</div>
+
+    <!-- Audio Background -->
+    <audio id="bgMusic" loop>
+      <source
+        src="{{ url_for('static', filename='sounds/1.mp3') }}"
+        type="audio/mpeg"
+      />
+    </audio>
+
+    <!-- Click Sound - PAKAI PRELOAD -->
+    <audio id="clickSound" preload="auto">
+      <source
+        src="{{ url_for('static', filename='sounds/click.mp3') }}"
+        type="audio/mpeg"
+      />
+    </audio>
+
+    <script>
+      // Music Control Logic
+      const musicBtn = document.getElementById("musicToggle");
+      const bgMusic = document.getElementById("bgMusic");
+      const clickSound = document.getElementById("clickSound");
+      let isPlaying = false;
+      let clickSoundReady = false;
+
+      bgMusic.volume = 0.3;
+      clickSound.volume = 0.5;
+
+      // Preload click sound dan tunggu sampai siap
+      clickSound.addEventListener('canplaythrough', function() {
+        clickSoundReady = true;
+        console.log("🔊 Click sound ready to play instantly");
+      });
+
+      clickSound.addEventListener('loadeddata', function() {
+        console.log("🔊 Click sound loaded");
+      });
+
+      // Force load click sound
+      clickSound.load();
+
+      // Fungsi untuk memainkan suara klik - VERSI INSTANT
+      function playClickSound() {
+        if (!clickSoundReady) {
+          console.log("⏳ Click sound not ready yet");
+          return;
+        }
+        
+        // Reset dan play dengan method yang lebih reliable
+        clickSound.currentTime = 0;
+        clickSound.play().catch(e => {
+          // Ignore minor errors
+        });
+      }
+
+      // Event listener untuk semua tombol dan link penting
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("🚀 Initializing click sounds...");
+
+        // Tangani SEMUA button (kecuali music toggle)
+        const allButtons = document.querySelectorAll("button:not(#musicToggle)");
+        allButtons.forEach((button) => {
+          button.addEventListener("click", function (e) {
+            playClickSound();
+          });
+        });
+
+        // Tangani LINK penting (back-btn dan link di menu-card)
+        const importantLinks = document.querySelectorAll("a.back-btn, .menu-card a, a.btn");
+        importantLinks.forEach((link) => {
+          link.addEventListener("click", function (e) {
+            playClickSound();
+            
+            // Simpan state musik sebelum navigasi
+            localStorage.setItem("musicPosition", bgMusic.currentTime.toString());
+            localStorage.setItem("musicPlaying", isPlaying.toString());
+          });
+        });
+
+        console.log("✅ Click sounds initialized");
+        console.log("Buttons:", allButtons.length);
+        console.log("Important links:", importantLinks.length);
+      });
+
+      // Music control logic
+      window.addEventListener("DOMContentLoaded", () => {
+        const savedPosition = localStorage.getItem("musicPosition");
+        const savedPlaying = localStorage.getItem("musicPlaying");
+
+        if (savedPosition) {
+          bgMusic.currentTime = parseFloat(savedPosition);
+        }
+
+        const currentPath = window.location.pathname;
+        const isMainPage = currentPath === "/" || currentPath === "/index" || currentPath === "";
+        const isLearningPage = currentPath.includes("/math") || currentPath.includes("/reading") || currentPath.includes("/games");
+
+        if (isMainPage && savedPlaying === "true") {
+          setTimeout(() => {
+            bgMusic.play().then(() => {
+              musicBtn.textContent = "🔊";
+              isPlaying = true;
+            }).catch((e) => {
+              console.log("⚠️ Autoplay blocked:", e.message);
+            });
+          }, 300);
+        }
+
+        if (isLearningPage) {
+          bgMusic.pause();
+          musicBtn.textContent = "🔇";
+          isPlaying = false;
+        }
+      });
+
+      setInterval(() => {
+        if (bgMusic.currentTime > 0) {
+          localStorage.setItem("musicPosition", bgMusic.currentTime.toString());
+          localStorage.setItem("musicPlaying", isPlaying.toString());
+        }
+      }, 1000);
+
+      window.addEventListener("beforeunload", () => {
+        localStorage.setItem("musicPosition", bgMusic.currentTime.toString());
+        localStorage.setItem("musicPlaying", isPlaying.toString());
+      });
+
+      musicBtn.addEventListener("click", () => {
+        if (isPlaying) {
+          bgMusic.pause();
+          musicBtn.textContent = "🔇";
+          isPlaying = false;
+          localStorage.setItem("musicPlaying", "false");
+        } else {
+          bgMusic.play().then(() => {
+            musicBtn.textContent = "🔊";
+            isPlaying = true;
+            localStorage.setItem("musicPlaying", "true");
+          }).catch((e) => {
+            console.log("❌ Play failed:", e);
+          });
+        }
+      });
+
+      bgMusic.addEventListener("play", () => {
+        isPlaying = true;
+        musicBtn.textContent = "🔊";
+      });
+
+      bgMusic.addEventListener("pause", () => {
+        isPlaying = false;
+        musicBtn.textContent = "🔇";
+      });
+
+      bgMusic.addEventListener("ended", () => {
+        bgMusic.currentTime = 0;
+        localStorage.setItem("musicPosition", "0");
+      });
+    </script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>
